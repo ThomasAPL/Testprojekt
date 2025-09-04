@@ -1,14 +1,15 @@
 {% extends "crm/base.html" %}
+{% load django_tables2 %}
 {% block title %}Adressen{% endblock %}
 {% block content %}
   <div class="toolbar">
     <form method="get" class="inline">
-      <input type="text" name="q" placeholder="Suche nach Name, Ort, E-Mail" value="{{ filter_q }}">
+      <input type="text" name="q" placeholder="Suche nach Name, Ort, E-Mail" value="{{ request.GET.q }}">
       <select name="type">
         <option value="">Alle Typen</option>
-        {% for value,label in types %}
-          <option value="{{ value }}" {% if value == filter_type %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
+        <option value="customer" {% if request.GET.type == "customer" %}selected{% endif %}>Kunde</option>
+        <option value="supplier" {% if request.GET.type == "supplier" %}selected{% endif %}>Lieferant</option>
+        <option value="general" {% if request.GET.type == "general" %}selected{% endif %}>Allgemein</option>
       </select>
       <button class="btn" type="submit">Filtern</button>
     </form>
@@ -17,44 +18,5 @@
     </div>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Typ</th>
-        <th>Ort</th>
-        <th>Land</th>
-        <th>Telefon</th>
-        <th>E-Mail</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for a in addresses %}
-        <tr>
-          <td><a href="{% url 'crm:address-detail' a.pk %}">{{ a.name }}</a></td>
-          <td class="muted">{{ a.get_type_display }}</td>
-          <td>{{ a.postal_code }} {{ a.city }}</td>
-          <td>{{ a.country }}</td>
-          <td>{{ a.phone }}</td>
-          <td><a href="mailto:{{ a.email }}">{{ a.email }}</a></td>
-          <td><a href="{% url 'crm:address-update' a.pk %}">Bearbeiten</a></td>
-        </tr>
-      {% empty %}
-        <tr><td colspan="7" class="muted">Keine Adressen gefunden.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  {% if is_paginated %}
-    <p class="pagination">
-      {% if page_obj.has_previous %}
-        <a class="btn" href="?page={{ page_obj.previous_page_number }}&q={{ filter_q }}&type={{ filter_type }}">Zurück</a>
-      {% endif %}
-      <span>Seite {{ page_obj.number }} von {{ paginator.num_pages }}</span>
-      {% if page_obj.has_next %}
-        <a class="btn" href="?page={{ page_obj.next_page_number }}&q={{ filter_q }}&type={{ filter_type }}">Weiter</a>
-      {% endif %}
-    </p>
-  {% endif %}
+  {% render_table table %}
 {% endblock %}
