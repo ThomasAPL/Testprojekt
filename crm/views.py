@@ -9,33 +9,42 @@ from django.views.generic import (
 from .models import Address, Contact, AddressType
 from .forms import AddressForm, ContactForm
 
-class AddressListView(ListView):
+from django_tables2 import SingleTableView
+from .models import Address
+from .tables import AddressTable
+
+class AddressListView(SingleTableView):
     model = Address
-    template_name = "crm/address_list.html"
-    context_object_name = "addresses"
-    paginate_by = 20  # Serverseitige Paginierung
-
-    def get_queryset(self):
-        qs = Address.objects.all()
-        q = self.request.GET.get("q", "").strip()
-        t = self.request.GET.get("type", "").strip()
-        if q:
-            qs = qs.filter(
-                Q(name__icontains=q) |
-                Q(city__icontains=q) |
-                Q(email__icontains=q) |
-                Q(phone__icontains=q)
-            )
-        if t in dict(AddressType.choices):
-            qs = qs.filter(type=t)
-        return qs
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx["filter_q"] = self.request.GET.get("q", "")
-        ctx["filter_type"] = self.request.GET.get("type", "")
-        ctx["types"] = AddressType.choices
-        return ctx
+    table_class = AddressTable
+    template_name = "address/address_list.html"
+    
+#class AddressListView(ListView):
+#    model = Address
+#    template_name = "crm/address_list.html"
+#    context_object_name = "addresses"
+#    paginate_by = 20  # Serverseitige Paginierung
+#
+#    def get_queryset(self):
+#        qs = Address.objects.all()
+#        q = self.request.GET.get("q", "").strip()
+#        t = self.request.GET.get("type", "").strip()
+#        if q:
+#            qs = qs.filter(
+#                Q(name__icontains=q) |
+#                Q(city__icontains=q) |
+#                Q(email__icontains=q) |
+#                Q(phone__icontains=q)
+#            )
+#        if t in dict(AddressType.choices):
+#            qs = qs.filter(type=t)
+#        return qs
+#
+#    def get_context_data(self, **kwargs):
+#        ctx = super().get_context_data(**kwargs)
+#        ctx["filter_q"] = self.request.GET.get("q", "")
+#        ctx["filter_type"] = self.request.GET.get("type", "")
+#        ctx["types"] = AddressType.choices
+#        return ctx
 
 
 class AddressDetailView(DetailView):
@@ -88,4 +97,5 @@ class ContactDeleteView(DeleteView):
     def get_success_url(self):
         # Nach dem Löschen zurück zur zugehörigen Adresse
         address = self.object.address
+
         return address.get_absolute_url() if hasattr(address, "get_absolute_url") else reverse_lazy("crm:address-list")
