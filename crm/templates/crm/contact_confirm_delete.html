@@ -1,0 +1,10 @@
+{% extends "crm/base.html" %}
+{% block title %}Ansprechpartner löschen{% endblock %}
+{% block content %}
+  <form method="post" class="card">
+    {% csrf_token %}
+    <p>Möchten Sie <strong>{{ object }}</strong> wirklich löschen?</p>
+    <button class="btn btn-danger" type="submit">Ja, löschen</button>
+    <a class="btn" href="{% url 'crm:address-detail' object.address.pk %}">Abbrechen</a>
+  </form>
+{% endblock %}

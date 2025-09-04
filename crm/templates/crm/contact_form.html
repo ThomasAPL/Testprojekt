@@ -1,0 +1,46 @@
+{% extends "crm/base.html" %}
+{% block title %}{% if form.instance.pk %}Ansprechpartner bearbeiten{% else %}Ansprechpartner anlegen{% endif %}{% endblock %}
+{% block content %}
+  <form method="post" class="card">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="grid">
+      <div class="col-6">
+        <label for="id_address">Adresse</label>
+        {{ form.address }}
+      </div>
+      <div class="col-3">
+        <label for="id_first_name">Vorname</label>
+        {{ form.first_name }}
+      </div>
+      <div class="col-3">
+        <label for="id_last_name">Nachname</label>
+        {{ form.last_name }}
+      </div>
+      <div class="col-6">
+        <label for="id_position">Funktion</label>
+        {{ form.position }}
+      </div>
+      <div class="col-4">
+        <label for="id_phone">Telefon</label>
+        {{ form.phone }}
+      </div>
+      <div class="col-4">
+        <label for="id_mobile">Mobil</label>
+        {{ form.mobile }}
+      </div>
+      <div class="col-4">
+        <label for="id_email">E-Mail</label>
+        {{ form.email }}
+      </div>
+      <div class="col-12">
+        <label for="id_is_primary">Hauptansprechpartner?</label>
+        {{ form.is_primary }}
+      </div>
+    </div>
+    <div style="margin-top: .8rem">
+      <button class="btn btn-primary" type="submit">Speichern</button>
+      <a class="btn" href="{% if form.instance.pk %}{% url 'crm:address-detail' form.instance.address.pk %}{% else %}{% url 'crm:address-list' %}{% endif %}">Abbrechen</a>
+    </div>
+  </form>
+{% endblock %}

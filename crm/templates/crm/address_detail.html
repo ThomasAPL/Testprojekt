@@ -1,0 +1,70 @@
+{% extends "crm/base.html" %}
+{% block title %}Adresse – {{ address.name }}{% endblock %}
+{% block content %}
+  <div class="card">
+    <div class="toolbar">
+      <h2 style="margin:0">{{ address.name }}</h2>
+      <div>
+        <a class="btn" href="{% url 'crm:address-update' address.pk %}">Bearbeiten</a>
+        <a class="btn btn-danger" href="{% url 'crm:address-delete' address.pk %}">Löschen</a>
+      </div>
+    </div>
+    <p class="muted">{{ address.get_type_display }}</p>
+    <div class="grid">
+      <div class="col-6">
+        <p>{{ address.address_line1 }}<br>{% if address.address_line2 %}{{ address.address_line2 }}<br>{% endif %}
+        {{ address.postal_code }} {{ address.city }}<br>{{ address.country }}</p>
+      </div>
+      <div class="col-6">
+        <p>
+          {% if address.phone %}Tel: {{ address.phone }}<br>{% endif %}
+          {% if address.email %}E-Mail: <a href="mailto:{{ address.email }}">{{ address.email }}</a><br>{% endif %}
+          {% if address.vat_id %}USt-IdNr.: {{ address.vat_id }}{% endif %}
+        </p>
+      </div>
+      {% if address.notes %}
+      <div class="col-12">
+        <strong>Notizen</strong>
+        <p>{{ address.notes|linebreaksbr }}</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <h3>Ansprechpartner</h3>
+  <div style="margin-bottom:.6rem">
+    <a class="btn btn-primary" href="{% url 'crm:contact-create' %}?address={{ address.pk }}">+ Neuer Ansprechpartner</a>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Funktion</th>
+        <th>Telefon</th>
+        <th>Mobil</th>
+        <th>E-Mail</th>
+        <th>Haupt?</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in address.contacts.all %}
+        <tr>
+          <td>{{ c.last_name }}, {{ c.first_name }}</td>
+          <td class="muted">{{ c.position }}</td>
+          <td>{{ c.phone }}</td>
+          <td>{{ c.mobile }}</td>
+          <td><a href="mailto:{{ c.email }}">{{ c.email }}</a></td>
+          <td>{% if c.is_primary %}✓{% endif %}</td>
+          <td>
+            <a href="{% url 'crm:contact-update' c.pk %}">Bearbeiten</a>
+            &nbsp;|&nbsp;
+            <a href="{% url 'crm:contact-delete' c.pk %}">Löschen</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7" class="muted">Keine Ansprechpartner vorhanden.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
