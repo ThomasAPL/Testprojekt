@@ -11,12 +11,27 @@ from .forms import AddressForm, ContactForm
 
 from django_tables2 import SingleTableView
 from .models import Address
-from .tables import AddressTable
+from .address_tables import AddressTable
 
 class AddressListView(SingleTableView):
     model = Address
     table_class = AddressTable
-    template_name = "address/address_list.html"
+    template_name = "crm/address_list.html"
+    
+    def get_queryset(self):
+        qs = Address.objects.all()
+        q = self.request.GET.get("q", "").strip()
+        t = self.request.GET.get("type", "").strip()
+        if q:
+            qs = qs.filter(
+                Q(name__icontains=q) |
+                Q(city__icontains=q) |
+                Q(email__icontains=q) |
+                Q(phone__icontains=q)
+            )
+        if t in dict(AddressType.choices):
+            qs = qs.filter(type=t)
+        return qs
     
 #class AddressListView(ListView):
 #    model = Address
